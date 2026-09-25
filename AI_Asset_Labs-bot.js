@@ -1,76 +1,64 @@
+import { Bot, InlineKeyboard } from "gramio";
+import express from "express";
 
-export default {
-  async fetch(request, env, ctx) {
-    if (request.method === "POST") {
-      try {
-        const update = await request.json();
-        if (update.message) {
-          await handleMessage(update.message, env);
-        }
-      } catch (e) {
-        console.log("Error:", e);
-      }
-      return new Response("OK", { status: 200 });
-    }
-    return new Response("AI Asset Labs Bot is running 🧪", { status: 200 });
-  }
-}
+const app = express();
+const port = process.env.PORT || 3000;
 
-async function handleMessage(message, env) {
-  const chatId = message.chat.id;
-  const text = (message.text || "").trim();
+const bot = new Bot(process.env.BOT_TOKEN);
 
-  // /start command
-  if (text === "/start") {
-    const welcome = `🧪 *Welcome to AI ASSET LABS*\n\nYour personal AI Vault is ready.\n\nClick below to enter:`;
-    await sendKeyboard(chatId, welcome, env);
-    return;
-  }
-
-  // ENTER LAB button or /enter
-  if (text.includes("ENTER LAB") || text === "/enter" || text === "/lab") {
-    await sendMessage(chatId, "🧪 *LAB ACCESS GRANTED*\n\nWhat do you want to create today?\n\n1. Generate Assets\n2. Check GRAM LIVE\n3. Settings", env);
-    return;
-  }
-
-  if (text.includes("GRAM LIVE")) {
-    await sendMessage(chatId, "🔴 GRAM LIVE is coming online...\n\nStay tuned!", env);
-    return;
-  }
-
-  // default echo
-  await sendMessage(chatId, `Got it: ${text}\n\nType /start to open menu.`, env);
-}
-
-async function sendMessage(chatId, text, env) {
-  const url = `https://api.telegram.org/bot${env.BOT_TOKEN}/sendMessage`;
-  await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text: text,
-      parse_mode: "Markdown"
-    })
+// 1. REGISTER BOT COMMAND MENU
+bot.onStart(async () => {
+  await bot.api.setMyCommands({
+    commands: [
+      { command: "start", description: "Launch AI Asset Labs" },
+      { command: "enter", description: "Enter Lab and Claim Access" },
+      { command: "gram", description: "Check GRAM Status LIVE" },
+      { command: "vip", description: "VIP Access Pass via Crypto" },
+      { command: "referral", description: "Invite Friend for Extra Days" },
+      { command: "concierge", description: "Direct Support" },
+    ],
   });
-}
+  console.log("Bot commands successfully registered!");
+});
 
-async function sendKeyboard(chatId, text, env) {
-  const url = `https://api.telegram.org/bot${env.BOT_TOKEN}/sendMessage`;
-  await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text: text,
-      parse_mode: "Markdown",
-      reply_markup: {
-        keyboard: [
-          [{ text: "ENTER LAB 🧪" }],
-          [{ text: "GRAM LIVE 🔴" }, { text: "HELP ❓" }]
-        ],
-        resize_keyboard: true
-      }
-    })
-  });
-}
+// 2. VIP CRYPTO PAYMENT HANDLER
+const sendVipPayment = async (ctx) => {
+  // Pulled dynamically from Render Environment Variables
+  const btcWallet = process.env.BTC_WALLET_ADDRESS || "Contact Concierge for BTC Address";
+  const zecWallet = process.env.ZEC_WALLET_ADDRESS || "Contact Concierge for ZEC Address";
+  const usdcPolygonWallet = process.env.USDC_POLYGON_ADDRESS || "Contact Concierge for USDC Polygon Address";
+  const gramWallet = process.env.GRAM_WALLET_ADDRESS || "Contact Concierge for GRAM/TON Address";
+
+  const paymentKeys = new InlineKeyboard()
+    .url("Pay via $GRAM / TON", "https://ton.app")
+    .row()
+    .url("Direct Concierge", "https://t.me/IsabelleGassen");
+
+  await ctx.send(
+    `💎 **AI_Asset_Labs VIP Access Pass**\n\n` +
+    `• 5x Daily Market Signals\n` +
+    `• Ready-to-Post X Copy & Visual Drops\n` +
+    `• Sovereign Settlement Alpha\n\n` +
+    `**1. Bitcoin (BTC Mainnet):**\n\`${btcWallet}\`\n\n` +
+    `**2. Zcash (ZEC - Private Settlement):**\n\`${zecWallet}\`\n\n` +
+    `**3. USDC (Polygon Network):**\n\`${usdcPolygonWallet}\`\n\n` +
+    `**4. TON / $GRAM Wallet:**\n\`${gramWallet}\`\n\n` +
+    `*Need to settle in another Altcoin (ETH, SOL, XMR)? Contact Concierge.*`,
+    { reply_markup: paymentKeys }
+  );
+};
+
+// COMMAND HANDLERS
+bot.command("start", (ctx) => ctx.send("Welcome to AI Asset Labs! Use /vip to view payment options."));
+bot.command("enter", (ctx) => ctx.send("Claiming access... Check /vip for membership key."));
+bot.command("gram", (ctx) => ctx.send("Checking $GRAM live status... System operational."));
+bot.command("vip", sendVipPayment);
+bot.hears("💎 VIP Pass Access", sendVipPayment);
+bot.command("referral", (ctx) => ctx.send("Share your link to earn +7 days VIP access."));
+bot.command("concierge", (ctx) => ctx.send("Contact Concierge directly: https://t.me/IsabelleGassen"));
+
+// HEALTH CHECK ENDPOINT FOR RENDER
+app.get("/", (req, res) => res.send("AI Asset Labs Engine Active"));
+app.listen(port, () => console.log(`Server listening on port ${port}`));
+
+bot.start();
