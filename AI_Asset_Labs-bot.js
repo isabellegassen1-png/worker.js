@@ -23,7 +23,6 @@ bot.onStart(async () => {
 
 // 2. VIP CRYPTO PAYMENT HANDLER
 const sendVipPayment = async (ctx) => {
-  // Pulled dynamically from Render Environment Variables
   const btcWallet = process.env.BTC_WALLET_ADDRESS || "Contact Concierge for BTC Address";
   const zecWallet = process.env.ZEC_WALLET_ADDRESS || "Contact Concierge for ZEC Address";
   const usdcPolygonWallet = process.env.USDC_POLYGON_ADDRESS || "Contact Concierge for USDC Polygon Address";
