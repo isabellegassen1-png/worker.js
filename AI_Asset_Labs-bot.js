@@ -20,7 +20,7 @@ const WALLETS = {
   gram: process.env.GRAM_WALLET_ADDRESS || 'UQDbzKWV-4KAUNC-K72G93rADOYr_Zssa_Lo75H5w8M5N2FY',
   sol: process.env.SOLANA_WALLET_ADDRESS || 'A31kTXMcQt1LHhRYZDSiv5pd8by5NUUpqsRZfNbqH3Yy',
   eth: process.env.ETH_WALLET_ADDRESS || '0x24ae6a1aaadd3304fa038e1e42bb150a2b41c11e'
-};
+}; 
 
 // --- Telegram Commands (Human Buyers) ---
 
