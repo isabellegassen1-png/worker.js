@@ -1,4 +1,4 @@
-const express = require('express');
+oconst express = require('express');
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 const cron = require('node-cron');
@@ -62,7 +62,8 @@ _Need alternative settlement (XMR)? Contact Concierge._`;
     reply_markup: {
       inline_keyboard: [
         [{ text: "💎 Pay via TON / $GRAM", url: "https://ton.app" }],
-        [{ text: "🏛️ Direct Concierge", url: "https://t.me/IsabelleGassen" }]
+        [{ text: "🏛️ Direct Concierge", url: "https://t.me/AI_Asset_Labs
+ }]
       ]
     },
     parse_mode: 'Markdown'
@@ -80,7 +81,8 @@ bot.onText(/\/referral/, (msg) => {
 });
 
 bot.onText(/\/concierge/, (msg) => {
-  bot.sendMessage(msg.chat.id, "Direct Concierge Access:\nhttps://t.me/IsabelleGassen");
+  bot.sendMessage(msg.chat.id, "Direct Concierge Access:\nhttps://t.me/AI_Asset_Labs
+;
 });
 
 // --- Automated 3x Daily Content (You.com API) ---
